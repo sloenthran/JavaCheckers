@@ -4,13 +4,17 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import pl.nogacz.checkers.board.Coordinates;
+import pl.nogacz.checkers.pawns.PawnClass;
 
 /**
  * @author Dawid Nogacz on 17.05.2019
  */
 public class Design {
     private static GridPane gridPane = new GridPane();
+    private static Image lightMove = new Image(Resources.getPath("light.png"));
 
     public Design() {
         createBoardBackground();
@@ -45,5 +49,21 @@ public class Design {
         }
 
         gridPane.setPadding(new Insets(37, 0, 0, 37));
+    }
+
+    public static void addPawn(Coordinates coordinates, PawnClass pawn) {
+        gridPane.add(pawn.getImage(), coordinates.getX(), coordinates.getY());
+    }
+
+    public static void addLightPawn(Coordinates coordinates, PawnClass pawn) {
+        gridPane.add(pawn.getLightImage(), coordinates.getX(), coordinates.getY());
+    }
+
+    public static void addLightMove(Coordinates coordinates) {
+        gridPane.add(new ImageView(lightMove), coordinates.getX(), coordinates.getY());
+    }
+
+    public static void removePawn(Coordinates coordinates) {
+        gridPane.getChildren().removeIf(node -> GridPane.getColumnIndex(node) == coordinates.getX() && GridPane.getRowIndex(node) == coordinates.getY());
     }
 }
