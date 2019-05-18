@@ -7,9 +7,12 @@ import pl.nogacz.checkers.application.Design;
 import pl.nogacz.checkers.pawns.Pawn;
 import pl.nogacz.checkers.pawns.PawnClass;
 import pl.nogacz.checkers.pawns.PawnColor;
+import pl.nogacz.checkers.pawns.PawnMoves;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Dawid Nogacz on 17.05.2019
@@ -19,6 +22,10 @@ public class Board {
 
     private boolean isSelected = false;
     private Coordinates selectedCoordinates;
+
+    private Set<Coordinates> possibleMoves = new HashSet<>();
+    private Set<Coordinates> possibleKick = new HashSet<>();
+    private Set<Coordinates> possiblePromote = new HashSet<>();
 
     private boolean isGameEnd = false;
     private boolean isComputerRound = false;
@@ -69,7 +76,11 @@ public class Board {
         if(isSelected) {
 
         } else {
-
+            if(isFieldNotNull(eventCoordinates)) {
+                isSelected = true;
+                selectedCoordinates = eventCoordinates;
+                lightSelect(eventCoordinates);
+            }
         }
     }
 
@@ -77,5 +88,44 @@ public class Board {
         if(event.getCode().equals(KeyCode.R) || event.getCode().equals(KeyCode.N)) {
             //TODO Add end game
         }
+    }
+
+    private void lightSelect(Coordinates coordinates) {
+        PawnMoves pawnMoves = new PawnMoves(coordinates, getPawn(coordinates));
+
+        possibleMoves = pawnMoves.getPossibleMoves();
+        possibleKick = pawnMoves.getPossibleKick();
+        possiblePromote = pawnMoves.getPossiblePromote();
+
+        possibleMoves.forEach(this::lightMove);
+        possibleKick.forEach(this::lightKick);
+
+        lightPawn(coordinates);
+    }
+
+    private void lightPawn(Coordinates coordinates) {
+        PawnClass pawn = getPawn(coordinates);
+        Design.removePawn(coordinates);
+        Design.addLightPawn(coordinates, pawn);
+    }
+
+    private void lightMove(Coordinates coordinates) {
+        Design.addLightMove(coordinates);
+    }
+
+    private void lightKick(Coordinates coordinates) {
+        //TODO Add lighting kick
+    }
+
+    public static boolean isFieldNotNull(Coordinates coordinates) {
+        return getPawn(coordinates) != null;
+    }
+
+    public static boolean isThisSameColor(Coordinates coordinates, PawnColor color) {
+        return getPawn(coordinates).getColor() == color;
+    }
+
+    private static PawnClass getPawn(Coordinates coordinates) {
+        return board.get(coordinates);
     }
 }

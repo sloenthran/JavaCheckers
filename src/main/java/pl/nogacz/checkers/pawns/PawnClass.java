@@ -22,6 +22,10 @@ public class PawnClass implements Serializable {
         return color;
     }
 
+    public Pawn getPawn() {
+        return pawn;
+    }
+
     public ImageView getImage() {
         Image image = new Image(Resources.getPath("pawns/" + color + "_" + pawn + ".png"));
         return new ImageView(image);
