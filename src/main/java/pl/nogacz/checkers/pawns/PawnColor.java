@@ -5,8 +5,7 @@ package pl.nogacz.checkers.pawns;
  */
 public enum PawnColor {
     BLACK,
-    WHITE,
-    DRAW_COLOR;
+    WHITE;
 
     public boolean isBlack() {
         return this == BLACK;

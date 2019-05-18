@@ -24,7 +24,7 @@ public class Checkers extends Application {
         scene.setOnMouseClicked(event -> board.readMouseEvent(event));
         scene.setOnKeyReleased(event -> board.readKeyboard(event));
 
-        primaryStage.setTitle("JavaChess");
+        primaryStage.setTitle("JavaCheckers");
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();

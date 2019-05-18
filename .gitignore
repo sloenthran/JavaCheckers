@@ -1,0 +1,6 @@
+/out
+.idea
+/build
+.gradle
+/gameCache
+JavaCheckers.jar
