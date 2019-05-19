@@ -74,12 +74,19 @@ public class Board {
         Coordinates eventCoordinates = new Coordinates((int) ((event.getX() - 37) / 85), (int) ((event.getY() - 37) / 85));
 
         if(isSelected) {
+            if(selectedCoordinates.equals(eventCoordinates)) {
+                selectedCoordinates = null;
+                isSelected = false;
 
+                unLightSelect(eventCoordinates);
+            }
         } else {
             if(isFieldNotNull(eventCoordinates)) {
-                isSelected = true;
-                selectedCoordinates = eventCoordinates;
-                lightSelect(eventCoordinates);
+                if(getPawn(eventCoordinates).getColor().isWhite()) {
+                    isSelected = true;
+                    selectedCoordinates = eventCoordinates;
+                    lightSelect(eventCoordinates);
+                }
             }
         }
     }
@@ -115,6 +122,26 @@ public class Board {
 
     private void lightKick(Coordinates coordinates) {
         //TODO Add lighting kick
+    }
+
+    private void unLightSelect(Coordinates coordinates) {
+        possibleMoves.forEach(this::unLightMove);
+        possibleKick.forEach(this::unLightKick);
+
+        unLightPawn(coordinates);
+    }
+
+    private void unLightPawn(Coordinates coordinates) {
+        Design.removePawn(coordinates);
+        Design.addPawn(coordinates, getPawn(coordinates));
+    }
+
+    private void unLightMove(Coordinates coordinates) {
+        Design.removePawn(coordinates);
+    }
+
+    private void unLightKick(Coordinates coordinates) {
+        //TODO Add unlighting kick
     }
 
     public static boolean isFieldNotNull(Coordinates coordinates) {
