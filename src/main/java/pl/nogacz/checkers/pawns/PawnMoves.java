@@ -17,6 +17,9 @@ public class PawnMoves {
     private Set<Coordinates> possibleKick = new HashSet<>();
     private Set<Coordinates> possiblePromote = new HashSet<>();
 
+    private boolean isKick = false;
+    private Coordinates kickedCoordinates = null;
+
     public PawnMoves(Coordinates coordinates, PawnClass pawn) {
         this.coordinates = coordinates;
         this.pawn = pawn;
@@ -26,31 +29,98 @@ public class PawnMoves {
 
     private void calculateMoves() {
         if(pawn.getPawn().isPawn()) {
-            int y = 0;
-
             if(pawn.getColor().isBlack()) {
-                y = coordinates.getY() + 1;
+                checkBottomLeft();
+                checkBottomRight();
             } else {
-                y = coordinates.getY() - 1;
+                checkUpLeft();
+                checkUpRight();
             }
-
-            checkPawnMove(new Coordinates(coordinates.getX() + 1, y));
-            checkPawnMove(new Coordinates(coordinates.getX() - 1, y));
         } else {
-
+            checkUpLeft();
+            checkUpRight();
+            checkBottomLeft();
+            checkBottomRight();
         }
     }
 
-    private void checkPawnMove(Coordinates coordinates) {
-        if(coordinates.isValid()) {
-            if(!Board.isFieldNotNull(coordinates)) {
-                if(pawn.getColor().isWhite() && coordinates.getY() == 0 || pawn.getColor().isBlack() && coordinates.getY() == 7) {
-                    possiblePromote.add(coordinates);
-                }
+    private void checkUpLeft() {
+        boolean checkUpLeft = true;
+        isKick = false;
 
-                possibleMoves.add(coordinates);
+        for(int i = 1; i < 8; i++) {
+            if(checkUpLeft) {
+                checkUpLeft = checkCoordinates(new Coordinates(coordinates.getX() - i, coordinates.getY() - i));
             }
         }
+    }
+
+    private void checkUpRight() {
+        boolean checkUpRight = true;
+        isKick = false;
+
+        for(int i = 1; i < 8; i++) {
+            if(checkUpRight) {
+                checkUpRight = checkCoordinates(new Coordinates(coordinates.getX() + i, coordinates.getY() - i));
+            }
+        }
+    }
+
+    private void checkBottomLeft() {
+        boolean checkBottomLeft = true;
+        isKick = false;
+
+        for(int i = 1; i < 8; i++) {
+            if(checkBottomLeft) {
+                checkBottomLeft = checkCoordinates(new Coordinates(coordinates.getX() - i, coordinates.getY() + i));
+            }
+        }
+    }
+
+    private void checkBottomRight() {
+        boolean checkBottomRight = true;
+        isKick = false;
+
+        for(int i = 1; i < 8; i++) {
+            if(checkBottomRight) {
+                checkBottomRight = checkCoordinates(new Coordinates(coordinates.getX() + i, coordinates.getY() + i));
+            }
+        }
+    }
+
+    private boolean checkCoordinates(Coordinates coordinates) {
+        if(!coordinates.isValid()) {
+            return false;
+        }
+
+        if(Board.isFieldNotNull(coordinates)) {
+            if(!Board.isThisSameColor(coordinates, pawn.getColor())) {
+                kickedCoordinates = coordinates;
+                isKick = true;
+                return true;
+            }
+        } else {
+            if((pawn.getColor().isWhite() && coordinates.getY() == 0 || pawn.getColor().isBlack() && coordinates.getY() == 7) && pawn.getPawn().isPawn()) {
+                possiblePromote.add(coordinates);
+            }
+
+            if(isKick) {
+                isKick = false;
+
+                possibleKick.add(coordinates);
+                possibleKick.add(kickedCoordinates);
+                return true;
+            } else {
+
+                possibleMoves.add(coordinates);
+
+                if(pawn.getPawn().isQueen()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public Set<Coordinates> getPossibleMoves() {
