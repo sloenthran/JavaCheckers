@@ -75,12 +75,12 @@ public class Board {
 
         if(isSelected) {
             if(selectedCoordinates.equals(eventCoordinates)) {
-                unLightSelect(eventCoordinates);
+                unLightSelect(selectedCoordinates);
 
                 selectedCoordinates = null;
                 isSelected = false;
             } else if(possibleMoves.contains(eventCoordinates)) {
-                unLightSelect(eventCoordinates);
+                unLightSelect(selectedCoordinates);
                 movePawn(selectedCoordinates, eventCoordinates);
                 selectedCoordinates = null;
                 isSelected = false;
@@ -102,7 +102,7 @@ public class Board {
 
     public void readKeyboard(KeyEvent event) {
         if(event.getCode().equals(KeyCode.R) || event.getCode().equals(KeyCode.N)) {
-            //TODO Add end game
+            //TODO Add keyboard
         }
     }
 
@@ -157,7 +157,7 @@ public class Board {
         possibleMoves.forEach(this::unLightMove);
         possibleKick.forEach(this::unLightKick);
 
-        unLightPawn(selectedCoordinates);
+        unLightPawn(coordinates);
     }
 
     private void unLightPawn(Coordinates coordinates) {

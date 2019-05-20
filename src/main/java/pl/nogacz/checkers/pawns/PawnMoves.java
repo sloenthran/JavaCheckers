@@ -30,65 +30,69 @@ public class PawnMoves {
     private void calculateMoves() {
         if(pawn.getPawn().isPawn()) {
             if(pawn.getColor().isBlack()) {
-                checkBottomLeft();
-                checkBottomRight();
+                checkBottomLeft(true);
+                checkBottomRight(true);
+                checkUpLeft(false);
+                checkUpRight(false);
             } else {
-                checkUpLeft();
-                checkUpRight();
+                checkUpLeft(true);
+                checkUpRight(true);
+                checkBottomLeft(false);
+                checkBottomRight(false);
             }
         } else {
-            checkUpLeft();
-            checkUpRight();
-            checkBottomLeft();
-            checkBottomRight();
+            checkUpLeft(true);
+            checkUpRight(true);
+            checkBottomLeft(true);
+            checkBottomRight(true);
         }
     }
 
-    private void checkUpLeft() {
+    private void checkUpLeft(boolean checkMove) {
         boolean checkUpLeft = true;
         isKick = false;
 
         for(int i = 1; i < 8; i++) {
             if(checkUpLeft) {
-                checkUpLeft = checkCoordinates(new Coordinates(coordinates.getX() - i, coordinates.getY() - i));
+                checkUpLeft = checkCoordinates(new Coordinates(coordinates.getX() - i, coordinates.getY() - i), checkMove);
             }
         }
     }
 
-    private void checkUpRight() {
+    private void checkUpRight(boolean checkMove) {
         boolean checkUpRight = true;
         isKick = false;
 
         for(int i = 1; i < 8; i++) {
             if(checkUpRight) {
-                checkUpRight = checkCoordinates(new Coordinates(coordinates.getX() + i, coordinates.getY() - i));
+                checkUpRight = checkCoordinates(new Coordinates(coordinates.getX() + i, coordinates.getY() - i), checkMove);
             }
         }
     }
 
-    private void checkBottomLeft() {
+    private void checkBottomLeft(boolean checkMove) {
         boolean checkBottomLeft = true;
         isKick = false;
 
         for(int i = 1; i < 8; i++) {
             if(checkBottomLeft) {
-                checkBottomLeft = checkCoordinates(new Coordinates(coordinates.getX() - i, coordinates.getY() + i));
+                checkBottomLeft = checkCoordinates(new Coordinates(coordinates.getX() - i, coordinates.getY() + i), checkMove);
             }
         }
     }
 
-    private void checkBottomRight() {
+    private void checkBottomRight(boolean checkMove) {
         boolean checkBottomRight = true;
         isKick = false;
 
         for(int i = 1; i < 8; i++) {
             if(checkBottomRight) {
-                checkBottomRight = checkCoordinates(new Coordinates(coordinates.getX() + i, coordinates.getY() + i));
+                checkBottomRight = checkCoordinates(new Coordinates(coordinates.getX() + i, coordinates.getY() + i), checkMove);
             }
         }
     }
 
-    private boolean checkCoordinates(Coordinates coordinates) {
+    private boolean checkCoordinates(Coordinates coordinates, boolean checkMove) {
         if(!coordinates.isValid()) {
             return false;
         }
@@ -110,7 +114,7 @@ public class PawnMoves {
                 possibleKick.add(coordinates);
                 possibleKick.add(kickedCoordinates);
                 return true;
-            } else {
+            } else if(checkMove) {
 
                 possibleMoves.add(coordinates);
 
