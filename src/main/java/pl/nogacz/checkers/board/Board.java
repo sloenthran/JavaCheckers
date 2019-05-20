@@ -75,18 +75,27 @@ public class Board {
 
         if(isSelected) {
             if(selectedCoordinates.equals(eventCoordinates)) {
+                unLightSelect(eventCoordinates);
+
+                selectedCoordinates = null;
+                isSelected = false;
+            } else if(possibleMoves.contains(eventCoordinates)) {
+                unLightSelect(eventCoordinates);
+                movePawn(selectedCoordinates, eventCoordinates);
                 selectedCoordinates = null;
                 isSelected = false;
 
-                unLightSelect(eventCoordinates);
+                computerMove();
+            } else if(possibleKick.contains(eventCoordinates)) {
+                //TODO Add kick logic
             }
-        } else {
+        } else if(eventCoordinates.isValid()) {
             if(isFieldNotNull(eventCoordinates)) {
-                if(getPawn(eventCoordinates).getColor().isWhite()) {
+                //if(getPawn(eventCoordinates).getColor().isWhite()) {
                     isSelected = true;
                     selectedCoordinates = eventCoordinates;
                     lightSelect(eventCoordinates);
-                }
+                //}
             }
         }
     }
@@ -95,6 +104,20 @@ public class Board {
         if(event.getCode().equals(KeyCode.R) || event.getCode().equals(KeyCode.N)) {
             //TODO Add end game
         }
+    }
+
+    private void computerMove() {
+        //TODO Add computer player
+    }
+
+    private void movePawn(Coordinates oldCoordinates, Coordinates newCoordinates) {
+        PawnClass pawn = getPawn(oldCoordinates);
+        Design.removePawn(oldCoordinates);
+        Design.removePawn(newCoordinates);
+        Design.addPawn(newCoordinates, pawn);
+
+        board.remove(oldCoordinates);
+        board.put(newCoordinates, pawn);
     }
 
     private void lightSelect(Coordinates coordinates) {
@@ -121,19 +144,26 @@ public class Board {
     }
 
     private void lightKick(Coordinates coordinates) {
-        //TODO Add lighting kick
+        PawnClass pawn = getPawn(coordinates);
+
+        if(pawn != null) {
+            lightPawn(coordinates);
+        } else {
+            lightMove(coordinates);
+        }
     }
 
     private void unLightSelect(Coordinates coordinates) {
         possibleMoves.forEach(this::unLightMove);
         possibleKick.forEach(this::unLightKick);
 
-        unLightPawn(coordinates);
+        unLightPawn(selectedCoordinates);
     }
 
     private void unLightPawn(Coordinates coordinates) {
+        PawnClass pawn = getPawn(coordinates);
         Design.removePawn(coordinates);
-        Design.addPawn(coordinates, getPawn(coordinates));
+        Design.addPawn(coordinates, pawn);
     }
 
     private void unLightMove(Coordinates coordinates) {
@@ -141,7 +171,13 @@ public class Board {
     }
 
     private void unLightKick(Coordinates coordinates) {
-        //TODO Add unlighting kick
+        PawnClass pawn = getPawn(coordinates);
+
+        if(pawn != null) {
+            unLightPawn(coordinates);
+        } else {
+            unLightMove(coordinates);
+        }
     }
 
     public static boolean isFieldNotNull(Coordinates coordinates) {
