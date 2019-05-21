@@ -113,9 +113,9 @@ public class PawnMoves {
 
                 possibleKick.add(coordinates);
                 possibleKick.add(kickedCoordinates);
-                return true;
-            } else if(checkMove) {
 
+                return false;
+            } else if(checkMove) {
                 possibleMoves.add(coordinates);
 
                 if(pawn.getPawn().isQueen()) {
