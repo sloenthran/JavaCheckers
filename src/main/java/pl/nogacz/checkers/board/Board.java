@@ -163,9 +163,7 @@ public class Board {
             pawn = new PawnClass(Pawn.QUEEN, pawn.getColor());
         }
 
-        PawnMoves pawnMoves = new PawnMoves(newCoordinates, pawn);
-
-        Coordinates enemyCoordinates = new Coordinates((oldCoordinates.getX() + newCoordinates.getX()) / 2, (oldCoordinates.getY() + newCoordinates.getY()) / 2);
+        Coordinates enemyCoordinates = getEnemyCoordinates(newCoordinates);
 
         Design.removePawn(oldCoordinates);
         Design.removePawn(enemyCoordinates);
@@ -175,12 +173,41 @@ public class Board {
         board.remove(enemyCoordinates);
         board.put(newCoordinates, pawn);
 
+        PawnMoves pawnMoves = new PawnMoves(newCoordinates, pawn);
+
         if(pawnMoves.getPossibleKick().size() > 0) {
             lightNewKick(newCoordinates);
             return true;
         }
 
         return false;
+    }
+
+    private Coordinates getEnemyCoordinates(Coordinates coordinates) {
+        for(int i = 1; i < 8; i++) {
+            Coordinates checkUpLeft = new Coordinates(coordinates.getX() - i, coordinates.getY() - i);
+            Coordinates checkUpRight = new Coordinates(coordinates.getX() + i, coordinates.getY() - i);
+            Coordinates checkBottomLeft = new Coordinates(coordinates.getX() - i, coordinates.getY() + i);
+            Coordinates checkBottomRight = new Coordinates(coordinates.getX() + i, coordinates.getY() + i);
+
+            if(possibleKick.contains(checkUpLeft)) {
+                return checkUpLeft;
+            }
+
+            if(possibleKick.contains(checkUpRight)) {
+                return checkUpRight;
+            }
+
+            if(possibleKick.contains(checkBottomLeft)) {
+                return checkBottomLeft;
+            }
+
+            if(possibleKick.contains(checkBottomRight)) {
+                return checkBottomRight;
+            }
+        }
+
+        return null;
     }
 
     private void lightSelect(Coordinates coordinates) {
