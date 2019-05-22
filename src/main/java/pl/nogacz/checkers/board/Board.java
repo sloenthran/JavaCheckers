@@ -27,6 +27,7 @@ public class Board {
     private Set<Coordinates> possibleMoves = new HashSet<>();
     private Set<Coordinates> possibleKick = new HashSet<>();
     private Set<Coordinates> possiblePromote = new HashSet<>();
+    private Set<Coordinates> kickRequired = new HashSet<>();
 
     private boolean isGameEnd = false;
     private boolean isComputerRound = false;
@@ -101,11 +102,11 @@ public class Board {
             }
         } else if(eventCoordinates.isValid()) {
             if(isFieldNotNull(eventCoordinates)) {
-                //if(getPawn(eventCoordinates).getColor().isWhite()) {
+                if(/*getPawn(eventCoordinates).getColor().isWhite() &&*/ isPossiblePawn(eventCoordinates, PawnColor.WHITE)) {
                     isSelected = true;
                     selectedCoordinates = eventCoordinates;
                     lightSelect(eventCoordinates);
-                //}
+                }
             }
         }
     }
@@ -118,6 +119,26 @@ public class Board {
 
     private void computerMove() {
         //TODO Add computer player
+    }
+
+    private boolean isPossiblePawn(Coordinates coordinates, PawnColor color) {
+        Set<Coordinates> possiblePawn = new HashSet<>();
+
+        for(Map.Entry<Coordinates, PawnClass> entry : board.entrySet()) {
+            if(entry.getValue().getColor() == color) {
+                PawnMoves pawnMoves = new PawnMoves(entry.getKey(), entry.getValue());
+
+                if(pawnMoves.getPossibleKick().size() > 0) {
+                    possiblePawn.add(entry.getKey());
+                }
+            }
+        }
+
+        if(possiblePawn.size() == 0 || possiblePawn.contains(coordinates)) {
+            return true;
+        }
+
+        return false;
     }
 
     private void movePawn(Coordinates oldCoordinates, Coordinates newCoordinates) {
