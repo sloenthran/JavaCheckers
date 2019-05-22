@@ -1,12 +1,11 @@
 package pl.nogacz.checkers.board;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * @author Dawid Nogacz on 17.05.2019
  */
-public class Coordinates implements Serializable {
+public class Coordinates {
     private int x;
     private int y;
 

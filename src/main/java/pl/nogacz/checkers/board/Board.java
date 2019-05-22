@@ -27,7 +27,6 @@ public class Board {
     private Set<Coordinates> possibleMoves = new HashSet<>();
     private Set<Coordinates> possibleKick = new HashSet<>();
     private Set<Coordinates> possiblePromote = new HashSet<>();
-    private Set<Coordinates> kickRequired = new HashSet<>();
 
     private boolean isGameEnd = false;
     private boolean isComputerRound = false;
@@ -184,27 +183,25 @@ public class Board {
     }
 
     private Coordinates getEnemyCoordinates(Coordinates coordinates) {
-        for(int i = 1; i < 8; i++) {
-            Coordinates checkUpLeft = new Coordinates(coordinates.getX() - i, coordinates.getY() - i);
-            Coordinates checkUpRight = new Coordinates(coordinates.getX() + i, coordinates.getY() - i);
-            Coordinates checkBottomLeft = new Coordinates(coordinates.getX() - i, coordinates.getY() + i);
-            Coordinates checkBottomRight = new Coordinates(coordinates.getX() + i, coordinates.getY() + i);
+        Coordinates checkUpLeft = new Coordinates(coordinates.getX() - 1, coordinates.getY() - 1);
+        Coordinates checkUpRight = new Coordinates(coordinates.getX() + 1, coordinates.getY() - 1);
+        Coordinates checkBottomLeft = new Coordinates(coordinates.getX() - 1, coordinates.getY() + 1);
+        Coordinates checkBottomRight = new Coordinates(coordinates.getX() + 1, coordinates.getY() + 1);
 
-            if(possibleKick.contains(checkUpLeft)) {
-                return checkUpLeft;
-            }
+        if(possibleKick.contains(checkUpLeft)) {
+            return checkUpLeft;
+        }
 
-            if(possibleKick.contains(checkUpRight)) {
-                return checkUpRight;
-            }
+        if(possibleKick.contains(checkUpRight)) {
+            return checkUpRight;
+        }
 
-            if(possibleKick.contains(checkBottomLeft)) {
-                return checkBottomLeft;
-            }
+        if(possibleKick.contains(checkBottomLeft)) {
+            return checkBottomLeft;
+        }
 
-            if(possibleKick.contains(checkBottomRight)) {
-                return checkBottomRight;
-            }
+        if(possibleKick.contains(checkBottomRight)) {
+            return checkBottomRight;
         }
 
         return null;
