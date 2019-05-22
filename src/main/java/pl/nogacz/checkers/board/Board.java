@@ -21,6 +21,7 @@ public class Board {
     private static HashMap<Coordinates, PawnClass> board = new HashMap<>();
 
     private boolean isSelected = false;
+    private boolean newKick = false;
     private Coordinates selectedCoordinates;
 
     private Set<Coordinates> possibleMoves = new HashSet<>();
@@ -74,7 +75,7 @@ public class Board {
         Coordinates eventCoordinates = new Coordinates((int) ((event.getX() - 37) / 85), (int) ((event.getY() - 37) / 85));
 
         if(isSelected) {
-            if(selectedCoordinates.equals(eventCoordinates)) {
+            if(selectedCoordinates.equals(eventCoordinates) && !newKick) {
                 unLightSelect(selectedCoordinates);
 
                 selectedCoordinates = null;
@@ -86,8 +87,17 @@ public class Board {
                 isSelected = false;
 
                 computerMove();
-            } else if(possibleKick.contains(eventCoordinates)) {
-                //TODO Add kick logic
+            } else if(possibleKick.contains(eventCoordinates) && !isFieldNotNull(eventCoordinates)) {
+                unLightSelect(selectedCoordinates);
+
+                if(!kickPawn(selectedCoordinates, eventCoordinates)) {
+                    isSelected = false;
+                    newKick = false;
+                    computerMove();
+                } else {
+                    newKick = true;
+                    selectedCoordinates = eventCoordinates;
+                }
             }
         } else if(eventCoordinates.isValid()) {
             if(isFieldNotNull(eventCoordinates)) {
@@ -112,12 +122,44 @@ public class Board {
 
     private void movePawn(Coordinates oldCoordinates, Coordinates newCoordinates) {
         PawnClass pawn = getPawn(oldCoordinates);
+
+        if(possiblePromote.contains(newCoordinates)) {
+            pawn = new PawnClass(Pawn.QUEEN, pawn.getColor());
+        }
+
         Design.removePawn(oldCoordinates);
         Design.removePawn(newCoordinates);
         Design.addPawn(newCoordinates, pawn);
 
         board.remove(oldCoordinates);
         board.put(newCoordinates, pawn);
+    }
+
+    private boolean kickPawn(Coordinates oldCoordinates, Coordinates newCoordinates) {
+        PawnClass pawn = getPawn(oldCoordinates);
+
+        if(possiblePromote.contains(newCoordinates)) {
+            pawn = new PawnClass(Pawn.QUEEN, pawn.getColor());
+        }
+
+        PawnMoves pawnMoves = new PawnMoves(newCoordinates, pawn);
+
+        Coordinates enemyCoordinates = new Coordinates((oldCoordinates.getX() + newCoordinates.getX()) / 2, (oldCoordinates.getY() + newCoordinates.getY()) / 2);
+
+        Design.removePawn(oldCoordinates);
+        Design.removePawn(enemyCoordinates);
+        Design.addPawn(newCoordinates, pawn);
+
+        board.remove(oldCoordinates);
+        board.remove(enemyCoordinates);
+        board.put(newCoordinates, pawn);
+
+        if(pawnMoves.getPossibleKick().size() > 0) {
+            lightNewKick(newCoordinates);
+            return true;
+        }
+
+        return false;
     }
 
     private void lightSelect(Coordinates coordinates) {
@@ -127,7 +169,23 @@ public class Board {
         possibleKick = pawnMoves.getPossibleKick();
         possiblePromote = pawnMoves.getPossiblePromote();
 
+        if(possibleKick.size() > 0) {
+            possibleMoves.clear();
+        }
+
         possibleMoves.forEach(this::lightMove);
+        possibleKick.forEach(this::lightKick);
+
+        lightPawn(coordinates);
+    }
+
+    private void lightNewKick(Coordinates coordinates) {
+        PawnMoves pawnMoves = new PawnMoves(coordinates, getPawn(coordinates));
+
+        possibleMoves.clear();
+        possibleKick = pawnMoves.getPossibleKick();
+        possiblePromote = pawnMoves.getPossiblePromote();
+
         possibleKick.forEach(this::lightKick);
 
         lightPawn(coordinates);

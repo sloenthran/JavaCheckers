@@ -98,7 +98,7 @@ public class PawnMoves {
         }
 
         if(Board.isFieldNotNull(coordinates)) {
-            if(!Board.isThisSameColor(coordinates, pawn.getColor())) {
+            if(!Board.isThisSameColor(coordinates, pawn.getColor()) && !isKick) {
                 kickedCoordinates = coordinates;
                 isKick = true;
                 return true;
@@ -113,8 +113,6 @@ public class PawnMoves {
 
                 possibleKick.add(coordinates);
                 possibleKick.add(kickedCoordinates);
-
-                return false;
             } else if(checkMove) {
                 possibleMoves.add(coordinates);
 
