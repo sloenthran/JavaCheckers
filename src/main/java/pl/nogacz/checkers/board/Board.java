@@ -1,10 +1,14 @@
 package pl.nogacz.checkers.board;
 
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import pl.nogacz.checkers.application.Design;
-import pl.nogacz.checkers.application.computer.Computer;
+import pl.nogacz.checkers.application.Computer;
+import pl.nogacz.checkers.application.EndGame;
 import pl.nogacz.checkers.pawns.Pawn;
 import pl.nogacz.checkers.pawns.PawnClass;
 import pl.nogacz.checkers.pawns.PawnColor;
@@ -30,6 +34,7 @@ public class Board {
     private Set<Coordinates> possiblePromote = new HashSet<>();
 
     private boolean isGameEnd = false;
+    private int roundWithoutKick = 0;
 
     private boolean isComputerRound = false;
     private Computer computer = new Computer();
@@ -75,7 +80,13 @@ public class Board {
     }
 
     public void readMouseEvent(MouseEvent event) {
-        if(isGameEnd || isComputerRound) {
+        if(isComputerRound) {
+            return;
+        }
+
+        checkGameEnd();
+
+        if(isGameEnd) {
             return;
         }
 
@@ -88,6 +99,8 @@ public class Board {
                 selectedCoordinates = null;
                 isSelected = false;
             } else if(possibleMoves.contains(eventCoordinates)) {
+                roundWithoutKick++;
+
                 unLightSelect(selectedCoordinates);
                 movePawn(selectedCoordinates, eventCoordinates);
                 selectedCoordinates = null;
@@ -95,6 +108,8 @@ public class Board {
 
                 computerMove();
             } else if(possibleKick.contains(eventCoordinates) && !isFieldNotNull(eventCoordinates)) {
+                roundWithoutKick = 0;
+
                 unLightSelect(selectedCoordinates);
 
                 if(!kickPawn(selectedCoordinates, eventCoordinates)) {
@@ -108,7 +123,7 @@ public class Board {
             }
         } else if(eventCoordinates.isValid()) {
             if(isFieldNotNull(eventCoordinates)) {
-                if(/*getPawn(eventCoordinates).getColor().isWhite() &&*/ isPossiblePawn(eventCoordinates, PawnColor.WHITE)) {
+                if(getPawn(eventCoordinates).getColor().isWhite() && isPossiblePawn(eventCoordinates, PawnColor.WHITE)) {
                     isSelected = true;
                     selectedCoordinates = eventCoordinates;
                     lightSelect(eventCoordinates);
@@ -119,12 +134,56 @@ public class Board {
 
     public void readKeyboard(KeyEvent event) {
         if(event.getCode().equals(KeyCode.R) || event.getCode().equals(KeyCode.N)) {
-            //TODO Add keyboard
+            EndGame.restartApplication();
         }
     }
 
     private void computerMove() {
-        //TODO Add computer player
+        checkGameEnd();
+
+        if(isGameEnd) {
+            return;
+        }
+
+        Task<Void> computerSleep = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                try {
+                    Thread.sleep(1000);
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+
+                return null;
+            }
+        };
+
+        computerSleep.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent event) {
+                Coordinates moveCoordinates = computer.chooseMove(selectedCoordinates);
+                System.out.println(moveCoordinates.getX() + ":" + moveCoordinates.getY());
+                unLightSelect(selectedCoordinates);
+
+                if(computer.isKickedMove()) {
+                    kickPawn(selectedCoordinates, moveCoordinates);
+                } else {
+                    movePawn(selectedCoordinates, moveCoordinates);
+                }
+
+                isComputerRound = false;
+                selectedCoordinates = null;
+            }
+        });
+
+        isComputerRound = true;
+        computer.getGameData();
+
+        selectedCoordinates = computer.choosePawn();
+
+        lightSelect(selectedCoordinates);
+
+        new Thread(computerSleep).start();
     }
 
     private boolean isPossiblePawn(Coordinates coordinates, PawnColor color) {
@@ -291,20 +350,36 @@ public class Board {
         }
     }
 
-    public static PawnClass addPawnWithoutDesign(Coordinates coordinates, PawnClass pawn) {
-        PawnClass oldPawn = null;
+    public void checkGameEnd() {
+        Set<Coordinates> possibleMovesWhite = new HashSet<>();
+        Set<Coordinates> possibleMovesBlack = new HashSet<>();
+        int pawnWhiteCount = 0;
+        int pawnBlackCount = 0;
 
-        if(isFieldNotNull(coordinates)) {
-            oldPawn = getPawn(coordinates);
-            board.remove(coordinates);
+        for(Map.Entry<Coordinates, PawnClass> entry : board.entrySet()) {
+            PawnMoves moves = new PawnMoves(entry.getKey(), entry.getValue());
+
+            if(entry.getValue().getColor().isBlack()) {
+                pawnBlackCount++;
+                possibleMovesBlack.addAll(moves.getPossibleKick());
+                possibleMovesBlack.addAll(moves.getPossibleMoves());
+            } else {
+                pawnWhiteCount++;
+                possibleMovesWhite.addAll(moves.getPossibleKick());
+                possibleMovesWhite.addAll(moves.getPossibleMoves());
+            }
         }
 
-        board.put(coordinates, pawn);
-        return oldPawn;
-    }
-
-    public static void removePawnWithoutDesign(Coordinates coordinates) {
-        board.remove(coordinates);
+        if(possibleMovesWhite.size() == 0 && possibleMovesBlack.size() == 0 || pawnBlackCount == 1 && pawnWhiteCount == 1 || roundWithoutKick == 12) {
+            isGameEnd = true;
+            new EndGame("Draw. Maybe you try again?");
+        } else if(possibleMovesWhite.size() == 0 || pawnWhiteCount <= 1) {
+            isGameEnd = true;
+            new EndGame("You loss. Maybe you try again?");
+        } else if(possibleMovesBlack.size() == 0 || pawnBlackCount <= 1) {
+            isGameEnd = true;
+            new EndGame("You win! Congratulations! :)");
+        }
     }
 
     public static boolean isFieldNotNull(Coordinates coordinates) {
