@@ -162,24 +162,35 @@ public class Board {
             @Override
             public void handle(WorkerStateEvent event) {
                 Coordinates moveCoordinates = computer.chooseMove(selectedCoordinates);
-                System.out.println(moveCoordinates.getX() + ":" + moveCoordinates.getY());
                 unLightSelect(selectedCoordinates);
 
                 if(computer.isKickedMove()) {
-                    kickPawn(selectedCoordinates, moveCoordinates);
+                    if(!kickPawn(selectedCoordinates, moveCoordinates)) {
+                        newKick = false;
+                        isComputerRound = false;
+                        selectedCoordinates = null;
+                    } else {
+                        newKick = true;
+                        selectedCoordinates = moveCoordinates;
+                        computerMove();
+                    }
                 } else {
                     movePawn(selectedCoordinates, moveCoordinates);
+
+                    isComputerRound = false;
+                    selectedCoordinates = null;
                 }
 
-                isComputerRound = false;
-                selectedCoordinates = null;
+
             }
         });
 
         isComputerRound = true;
         computer.getGameData();
 
-        selectedCoordinates = computer.choosePawn();
+        if(!newKick) {
+            selectedCoordinates = computer.choosePawn();
+        }
 
         lightSelect(selectedCoordinates);
 
@@ -370,7 +381,7 @@ public class Board {
             }
         }
 
-        if(possibleMovesWhite.size() == 0 && possibleMovesBlack.size() == 0 || pawnBlackCount == 1 && pawnWhiteCount == 1 || roundWithoutKick == 12) {
+        if(roundWithoutKick == 12) {
             isGameEnd = true;
             new EndGame("Draw. Maybe you try again?");
         } else if(possibleMovesWhite.size() == 0 || pawnWhiteCount <= 1) {
