@@ -4,6 +4,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import pl.nogacz.checkers.application.Design;
+import pl.nogacz.checkers.application.computer.Computer;
 import pl.nogacz.checkers.pawns.Pawn;
 import pl.nogacz.checkers.pawns.PawnClass;
 import pl.nogacz.checkers.pawns.PawnColor;
@@ -29,10 +30,16 @@ public class Board {
     private Set<Coordinates> possiblePromote = new HashSet<>();
 
     private boolean isGameEnd = false;
+
     private boolean isComputerRound = false;
+    private Computer computer = new Computer();
 
     public Board() {
         addStartPawn();
+    }
+
+    public static HashMap<Coordinates, PawnClass> getBoard() {
+        return board;
     }
 
     private void addStartPawn() {
@@ -184,21 +191,24 @@ public class Board {
 
     private Coordinates getEnemyCoordinates(Coordinates coordinates) {
         Coordinates checkUpLeft = new Coordinates(coordinates.getX() - 1, coordinates.getY() - 1);
-        Coordinates checkUpRight = new Coordinates(coordinates.getX() + 1, coordinates.getY() - 1);
-        Coordinates checkBottomLeft = new Coordinates(coordinates.getX() - 1, coordinates.getY() + 1);
-        Coordinates checkBottomRight = new Coordinates(coordinates.getX() + 1, coordinates.getY() + 1);
 
         if(possibleKick.contains(checkUpLeft)) {
             return checkUpLeft;
         }
 
+        Coordinates checkUpRight = new Coordinates(coordinates.getX() + 1, coordinates.getY() - 1);
+
         if(possibleKick.contains(checkUpRight)) {
             return checkUpRight;
         }
 
+        Coordinates checkBottomLeft = new Coordinates(coordinates.getX() - 1, coordinates.getY() + 1);
+
         if(possibleKick.contains(checkBottomLeft)) {
             return checkBottomLeft;
         }
+
+        Coordinates checkBottomRight = new Coordinates(coordinates.getX() + 1, coordinates.getY() + 1);
 
         if(possibleKick.contains(checkBottomRight)) {
             return checkBottomRight;
@@ -249,9 +259,7 @@ public class Board {
     private void lightKick(Coordinates coordinates) {
         PawnClass pawn = getPawn(coordinates);
 
-        if(pawn != null) {
-            lightPawn(coordinates);
-        } else {
+        if(pawn == null) {
             lightMove(coordinates);
         }
     }
@@ -283,6 +291,22 @@ public class Board {
         }
     }
 
+    public static PawnClass addPawnWithoutDesign(Coordinates coordinates, PawnClass pawn) {
+        PawnClass oldPawn = null;
+
+        if(isFieldNotNull(coordinates)) {
+            oldPawn = getPawn(coordinates);
+            board.remove(coordinates);
+        }
+
+        board.put(coordinates, pawn);
+        return oldPawn;
+    }
+
+    public static void removePawnWithoutDesign(Coordinates coordinates) {
+        board.remove(coordinates);
+    }
+
     public static boolean isFieldNotNull(Coordinates coordinates) {
         return getPawn(coordinates) != null;
     }
@@ -291,7 +315,7 @@ public class Board {
         return getPawn(coordinates).getColor() == color;
     }
 
-    private static PawnClass getPawn(Coordinates coordinates) {
+    public static PawnClass getPawn(Coordinates coordinates) {
         return board.get(coordinates);
     }
 }
