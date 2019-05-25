@@ -6,6 +6,7 @@ import pl.nogacz.checkers.pawns.PawnClass;
 import pl.nogacz.checkers.pawns.PawnMoves;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Dawid Nogacz on 25.05.2019
@@ -52,7 +53,7 @@ public class Computer {
             PawnMoves moves = new PawnMoves(coordinates, Board.getPawn(coordinates));
 
             Set<Coordinates> cacheMoves = new HashSet<>();
-            cacheMoves.addAll(moves.getPossibleKick());
+            cacheMoves.addAll(moves.getPossibleKick().stream().filter(entry -> Board.getPawn(entry) != null).collect(Collectors.toSet()));
             cacheMoves.addAll(moves.getPossibleMoves());
 
             int point = getMinNumber(cacheMoves, Board.getPawn(coordinates));
@@ -66,7 +67,7 @@ public class Computer {
             PawnMoves moves = new PawnMoves(coordinates, Board.getPawn(coordinates));
 
             Set<Coordinates> cacheMoves = new HashSet<>();
-            cacheMoves.addAll(moves.getPossibleKick());
+            cacheMoves.addAll(moves.getPossibleKick().stream().filter(entry -> Board.getPawn(entry) != null).collect(Collectors.toSet()));
             cacheMoves.addAll(moves.getPossibleMoves());
 
             for(Coordinates moveCoordinates : cacheMoves) {
@@ -99,7 +100,9 @@ public class Computer {
 
         Set<Coordinates> listWithOnlyMinNumber = getListWithOnlyMinNumber(possibleMove, pawn);
 
-        listWithOnlyMinNumber.forEach(entry -> checkEnemyKickField(entry, pawn));
+        listWithOnlyMinNumber.stream()
+                .filter(entry -> Board.getPawn(entry)!= null)
+                .forEach(entry -> checkEnemyKickField(entry, pawn));
 
         if(possibleKickAndNotIsEnemyKickMe.size() > 0) {
             return selectRandom(possibleKickAndNotIsEnemyKickMe);
