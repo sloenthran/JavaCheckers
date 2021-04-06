@@ -17,6 +17,7 @@ public class Design {
     private static GridPane gridPane = new GridPane();
     private static Image lightMove = new Image(Resources.getPath("light.png"));
     private static Image lightRedMove = new Image(Resources.getPath("lightRed.png"));
+    private static Image lightGreenMove = new Image(Resources.getPath("lightGreen.png"));
 
     public Design() {
         createBoardBackground();
@@ -68,6 +69,9 @@ public class Design {
 
     public static void addLightRedMove(Coordinates coordinates) {
         gridPane.add(new ImageView(lightRedMove), coordinates.getX(), coordinates.getY());
+    }
+    public static void addLightGreenMove(Coordinates coordinates) {
+        gridPane.add(new ImageView(lightGreenMove), coordinates.getX(), coordinates.getY());
     }
 
     public static void removePawn(Coordinates coordinates) {

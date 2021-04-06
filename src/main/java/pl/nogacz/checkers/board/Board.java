@@ -329,46 +329,79 @@ public class Board {
         possibleKick.forEach(this::lightKick);
 
         if(possibleMoves.size() != 0 && getPawn(coordinates).getColor() == PawnColor.WHITE){
-            for (Coordinates coordinates2 : possibleMoves) {
-                //check is there a pawn
-                PawnClass rightUp = getPawn(new Coordinates(coordinates2.getX()+1,coordinates2.getY()-1));
-                PawnClass leftUp = getPawn(new Coordinates(coordinates2.getX()-1,coordinates2.getY()-1));
-                PawnClass rightDown = getPawn(new Coordinates(coordinates2.getX()+1,coordinates2.getY()+1));
-                PawnClass leftDown = getPawn(new Coordinates(coordinates2.getX()-1,coordinates2.getY()+1)); 
-
-                Coordinates rightUpCoor = new Coordinates(coordinates2.getX()+1,coordinates2.getY()-1);
-                Coordinates rightDownCoor = new Coordinates(coordinates2.getX()+1,coordinates2.getY()+1);
-                Coordinates leftUpCoor = new Coordinates(coordinates2.getX()-1,coordinates2.getY()-1);
-                Coordinates leftDownCoor = new Coordinates(coordinates2.getX()-1,coordinates2.getY()+1);
-                
-                if(rightUp != null && rightUp.getColor() == PawnColor.BLACK){
-                    if(leftDown == null || leftDownCoor.equals(coordinates))
-                        lightRedMove(coordinates2);
-                    
-                    
-                }                
-                else if(rightDown != null && rightDown.getColor() == PawnColor.BLACK){
-                    if(leftUp == null || leftUpCoor.equals(coordinates))
-                        lightRedMove(coordinates2);
-                }
-
-                else if( leftUp != null && leftUp.getColor() == PawnColor.BLACK){
-                    if(rightDown == null || rightDownCoor.equals(coordinates))
-                        lightRedMove(coordinates2);
-                }
-                else if( leftDown != null && leftDown.getColor() == PawnColor.BLACK){
-                    if(rightUp == null || rightUpCoor.equals(coordinates) )
-                        lightRedMove(coordinates2);
-                }
-                //if there is no red light check green lights                
-
-                
-            }
+            lightRedCoordinates(possibleMoves,coordinates);
         }
 
 
 
         lightPawn(coordinates);
+    }
+
+
+    private void lightRedCoordinates(Set <Coordinates> moves,Coordinates coordinates){
+        
+        for (Coordinates coordinates2 : moves) {
+            //check is there a pawn
+            PawnClass rightUp = getPawn(new Coordinates(coordinates2.getX()+1,coordinates2.getY()-1));
+            PawnClass leftUp = getPawn(new Coordinates(coordinates2.getX()-1,coordinates2.getY()-1));
+            PawnClass rightDown = getPawn(new Coordinates(coordinates2.getX()+1,coordinates2.getY()+1));
+            PawnClass leftDown = getPawn(new Coordinates(coordinates2.getX()-1,coordinates2.getY()+1)); 
+
+            Coordinates rightUpCoor = new Coordinates(coordinates2.getX()+1,coordinates2.getY()-1);
+            Coordinates rightDownCoor = new Coordinates(coordinates2.getX()+1,coordinates2.getY()+1);
+            Coordinates leftUpCoor = new Coordinates(coordinates2.getX()-1,coordinates2.getY()-1);
+            Coordinates leftDownCoor = new Coordinates(coordinates2.getX()-1,coordinates2.getY()+1);
+            
+            if(rightUp != null && rightUp.getColor() == PawnColor.BLACK &&((leftDown == null && leftDownCoor.isValid()) || leftDownCoor.equals(coordinates)) ){                
+                    lightRedMove(coordinates2);        
+            }                
+            else if(rightDown != null && rightDown.getColor() == PawnColor.BLACK &&((leftUp == null && leftUpCoor.isValid()) || leftUpCoor.equals(coordinates))){                
+                    lightRedMove(coordinates2);
+            }
+
+            else if( leftUp != null && leftUp.getColor() == PawnColor.BLACK &&((rightDown == null && rightDownCoor.isValid())|| rightDownCoor.equals(coordinates))){                
+                    lightRedMove(coordinates2);
+            }
+            else if( leftDown != null && leftDown.getColor() == PawnColor.BLACK && ((rightUp == null&& rightUpCoor.isValid()) || rightUpCoor.equals(coordinates) )){                
+                    lightRedMove(coordinates2);
+            }
+            else{     
+                lightGreenMoves(coordinates2);
+            }
+        }
+    }
+
+    private void lightGreenMoves(Coordinates coordinates2){
+        System.out.println(coordinates2.getX()+" "+ coordinates2.getY());
+        Coordinates rightUpCoor = new Coordinates(coordinates2.getX()+1,coordinates2.getY()-1);
+        Coordinates rightDownCoor = new Coordinates(coordinates2.getX()+1,coordinates2.getY()+1);
+        Coordinates leftUpCoor = new Coordinates(coordinates2.getX()-1,coordinates2.getY()-1);
+        Coordinates leftDownCoor = new Coordinates(coordinates2.getX()-1,coordinates2.getY()+1);
+
+        Coordinates rightUpUpCoor = new Coordinates(rightUpCoor.getX()+1,rightUpCoor.getY()-1);
+        Coordinates rightDownDownCoor = new Coordinates(rightDownCoor.getX()+1,rightDownCoor.getY()+1);
+        Coordinates leftUpUpCoor = new Coordinates(leftUpCoor.getX()-1,leftUpCoor.getY()-1);
+        Coordinates leftDownDownCoor = new Coordinates(leftDownCoor.getX()-1,leftDownCoor.getY()+1);
+
+        if(getPawn(rightUpCoor) != null &&getPawn(rightUpCoor).getColor() == PawnColor.WHITE && getPawn(rightUpUpCoor) != null && getPawn(rightUpUpCoor).getColor() == PawnColor.BLACK){
+            lightGreenMove(coordinates2);
+        }
+        else if(getPawn(rightDownCoor) != null && getPawn(rightDownCoor).getColor() == PawnColor.WHITE && getPawn(rightDownDownCoor) != null && getPawn(rightDownDownCoor).getColor() == PawnColor.BLACK){
+            lightGreenMove(coordinates2);
+        }
+        else if(getPawn(leftUpCoor) != null  && getPawn(leftUpCoor).getColor() == PawnColor.WHITE && getPawn(leftUpUpCoor) != null &&  getPawn(leftUpUpCoor).getColor() == PawnColor.BLACK){
+            lightGreenMove(coordinates2);
+        }
+        else if(getPawn(leftDownCoor) != null && getPawn(leftDownCoor).getColor() == PawnColor.WHITE && getPawn(leftDownDownCoor) != null && getPawn(leftDownDownCoor).getColor() == PawnColor.BLACK){
+            lightGreenMove(coordinates2);
+        }
+        else if(getPawn(leftDownCoor) != null && getPawn(leftDownCoor).getColor() == PawnColor.WHITE && getPawn(rightUpCoor) != null && getPawn(rightUpCoor).getColor() == PawnColor.BLACK){
+            lightGreenMove(coordinates2);
+        }
+        else if( getPawn(rightDownCoor) != null && getPawn(rightDownCoor).getColor() == PawnColor.WHITE && getPawn(leftUpCoor) != null && getPawn(leftUpCoor).getColor() == PawnColor.BLACK){
+            lightGreenMove(coordinates2);
+        }
+
     }
 
     private void lightNewKick(Coordinates coordinates) {
@@ -395,7 +428,10 @@ public class Board {
 
     private void lightRedMove(Coordinates coordinates){
         Design.addLightRedMove(coordinates);
-
+    }
+    private void lightGreenMove(Coordinates coordinates){
+        System.out.println("Bastı");
+        Design.addLightGreenMove(coordinates);
     }
 
     private void lightKick(Coordinates coordinates) {
