@@ -25,6 +25,7 @@ public class PawnMoves {
         this.pawn = pawn;
 
         calculateMoves();
+
     }
 
     private void calculateMoves() {
@@ -96,7 +97,7 @@ public class PawnMoves {
         if(!coordinates.isValid()) {
             return false;
         }
-
+        
         if(Board.isFieldNotNull(coordinates)) {
             if(!Board.isThisSameColor(coordinates, pawn.getColor()) && !isKick) {
                 kickedCoordinates = coordinates;
@@ -104,6 +105,7 @@ public class PawnMoves {
                 return true;
             }
         } else {
+            // will change this area
             if((pawn.getColor().isWhite() && coordinates.getY() == 0 || pawn.getColor().isBlack() && coordinates.getY() == 7) && pawn.getPawn().isPawn()) {
                 possiblePromote.add(coordinates);
             }
@@ -115,7 +117,7 @@ public class PawnMoves {
                 possibleKick.add(kickedCoordinates);
             } else if(checkMove) {
                 possibleMoves.add(coordinates);
-
+ 
                 if(pawn.getPawn().isQueen()) {
                     return true;
                 }

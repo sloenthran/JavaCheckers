@@ -22,9 +22,13 @@ import java.util.Set;
 /**
  * @author Dawid Nogacz on 17.05.2019
  */
-public class Board {
+public class Board {    
     private static HashMap<Coordinates, PawnClass> board = new HashMap<>();
-
+    
+    /*
+    //added for recursion steps
+    public HashMap<Coordinates, PawnClass> boardRecursion = new HashMap<>();
+    */
     private boolean isSelected = false;
     private boolean newKick = false;
     private Coordinates selectedCoordinates;
@@ -42,6 +46,26 @@ public class Board {
     public Board() {
         addStartPawn();
     }
+
+
+
+    /*
+    // adding new constructor for copy
+    public Board(boolean isRecursion){
+
+        for(Map.Entry<Coordinates, PawnClass> entry : board.entrySet()) {
+            Coordinates cor = entry.getKey();
+            PawnClass pc = entry.getValue();
+            PawnClass newPC = new PawnClass(
+                pc.getPawn().isPawn() ? Pawn.PAWN : Pawn.QUEEN,
+                pc.getColor().isBlack() ? PawnColor.BLACK : PawnColor.WHITE
+            );
+            Coordinates newCoor = new Coordinates(cor.getX(),cor.getY());
+
+            board.put(newCoor, newPC);
+
+        } 
+    }*/
 
     public static HashMap<Coordinates, PawnClass> getBoard() {
         return board;
@@ -287,19 +311,62 @@ public class Board {
         return null;
     }
 
-    private void lightSelect(Coordinates coordinates) {
+    
+    private void lightSelect(Coordinates coordinates) {        
         PawnMoves pawnMoves = new PawnMoves(coordinates, getPawn(coordinates));
 
         possibleMoves = pawnMoves.getPossibleMoves();
         possibleKick = pawnMoves.getPossibleKick();
         possiblePromote = pawnMoves.getPossiblePromote();
+        
 
         if(possibleKick.size() > 0) {
             possibleMoves.clear();
         }
 
+
         possibleMoves.forEach(this::lightMove);
         possibleKick.forEach(this::lightKick);
+
+        if(possibleMoves.size() != 0 && getPawn(coordinates).getColor() == PawnColor.WHITE){
+            for (Coordinates coordinates2 : possibleMoves) {
+                //check is there a pawn
+                PawnClass rightUp = getPawn(new Coordinates(coordinates2.getX()+1,coordinates2.getY()-1));
+                PawnClass leftUp = getPawn(new Coordinates(coordinates2.getX()-1,coordinates2.getY()-1));
+                PawnClass rightDown = getPawn(new Coordinates(coordinates2.getX()+1,coordinates2.getY()+1));
+                PawnClass leftDown = getPawn(new Coordinates(coordinates2.getX()-1,coordinates2.getY()+1)); 
+
+                Coordinates rightUpCoor = new Coordinates(coordinates2.getX()+1,coordinates2.getY()-1);
+                Coordinates rightDownCoor = new Coordinates(coordinates2.getX()+1,coordinates2.getY()+1);
+                Coordinates leftUpCoor = new Coordinates(coordinates2.getX()-1,coordinates2.getY()-1);
+                Coordinates leftDownCoor = new Coordinates(coordinates2.getX()-1,coordinates2.getY()+1);
+                
+                if(rightUp != null && rightUp.getColor() == PawnColor.BLACK){
+                    if(leftDown == null || leftDownCoor.equals(coordinates))
+                        lightRedMove(coordinates2);
+                    
+                    
+                }                
+                else if(rightDown != null && rightDown.getColor() == PawnColor.BLACK){
+                    if(leftUp == null || leftUpCoor.equals(coordinates))
+                        lightRedMove(coordinates2);
+                }
+
+                else if( leftUp != null && leftUp.getColor() == PawnColor.BLACK){
+                    if(rightDown == null || rightDownCoor.equals(coordinates))
+                        lightRedMove(coordinates2);
+                }
+                else if( leftDown != null && leftDown.getColor() == PawnColor.BLACK){
+                    if(rightUp == null || rightUpCoor.equals(coordinates) )
+                        lightRedMove(coordinates2);
+                }
+                //if there is no red light check green lights                
+
+                
+            }
+        }
+
+
 
         lightPawn(coordinates);
     }
@@ -326,6 +393,11 @@ public class Board {
         Design.addLightMove(coordinates);
     }
 
+    private void lightRedMove(Coordinates coordinates){
+        Design.addLightRedMove(coordinates);
+
+    }
+
     private void lightKick(Coordinates coordinates) {
         PawnClass pawn = getPawn(coordinates);
 
@@ -334,7 +406,7 @@ public class Board {
         }
     }
 
-    private void unLightSelect(Coordinates coordinates) {
+    private void unLightSelect(Coordinates coordinates) {        
         possibleMoves.forEach(this::unLightMove);
         possibleKick.forEach(this::unLightKick);
 

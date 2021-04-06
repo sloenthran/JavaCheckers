@@ -33,4 +33,6 @@ public class PawnClass {
         Image image = new Image(Resources.getPath("pawns/light_" + color + "_" + pawn + ".png"));
         return new ImageView(image);
     }
+
+
 }

@@ -6,6 +6,7 @@ import javafx.geometry.VPos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import jdk.javadoc.internal.doclets.formats.html.resources.standard;
 import pl.nogacz.checkers.board.Coordinates;
 import pl.nogacz.checkers.pawns.PawnClass;
 
@@ -15,6 +16,7 @@ import pl.nogacz.checkers.pawns.PawnClass;
 public class Design {
     private static GridPane gridPane = new GridPane();
     private static Image lightMove = new Image(Resources.getPath("light.png"));
+    private static Image lightRedMove = new Image(Resources.getPath("lightRed.png"));
 
     public Design() {
         createBoardBackground();
@@ -58,9 +60,14 @@ public class Design {
     public static void addLightPawn(Coordinates coordinates, PawnClass pawn) {
         gridPane.add(pawn.getLightImage(), coordinates.getX(), coordinates.getY());
     }
+    
 
     public static void addLightMove(Coordinates coordinates) {
         gridPane.add(new ImageView(lightMove), coordinates.getX(), coordinates.getY());
+    }
+
+    public static void addLightRedMove(Coordinates coordinates) {
+        gridPane.add(new ImageView(lightRedMove), coordinates.getX(), coordinates.getY());
     }
 
     public static void removePawn(Coordinates coordinates) {
