@@ -331,8 +331,14 @@ public class Board {
         if(possibleMoves.size() != 0 && getPawn(coordinates).getColor() == PawnColor.WHITE){
             lightRedCoordinates(possibleMoves,coordinates);
         }
-
-
+        
+        if(possibleKick.size() != 0 && getPawn(coordinates).getColor() == PawnColor.WHITE && getPawn(coordinates).getPawn() == Pawn.PAWN)
+        {
+            for (Coordinates coordinates2 : possibleKick) {
+                if(getPawn(coordinates2) == null)
+                    lightGreenMove(coordinates2);   
+            }            
+        }
 
         lightPawn(coordinates);
     }
@@ -372,7 +378,6 @@ public class Board {
     }
 
     private void lightGreenMoves(Coordinates coordinates2){
-        System.out.println(coordinates2.getX()+" "+ coordinates2.getY());
         Coordinates rightUpCoor = new Coordinates(coordinates2.getX()+1,coordinates2.getY()-1);
         Coordinates rightDownCoor = new Coordinates(coordinates2.getX()+1,coordinates2.getY()+1);
         Coordinates leftUpCoor = new Coordinates(coordinates2.getX()-1,coordinates2.getY()-1);
@@ -401,8 +406,21 @@ public class Board {
         else if( getPawn(rightDownCoor) != null && getPawn(rightDownCoor).getColor() == PawnColor.WHITE && getPawn(leftUpCoor) != null && getPawn(leftUpCoor).getColor() == PawnColor.BLACK){
             lightGreenMove(coordinates2);
         }
+        else if( !rightUpCoor.isValid() &&getPawn(rightUpCoor) == null){
+            lightGreenMove(coordinates2);
+        }
+        else if( !leftUpCoor.isValid() &&getPawn(leftUpCoor) == null){
+            lightGreenMove(coordinates2);
+        }
+        else if( !leftDownCoor.isValid() &&getPawn(leftDownCoor) == null){
+            lightGreenMove(coordinates2);
+        }
+        else if( !leftUpCoor.isValid() &&getPawn(rightDownCoor) == null){
+            lightGreenMove(coordinates2);
+        }
 
     }
+
 
     private void lightNewKick(Coordinates coordinates) {
         PawnMoves pawnMoves = new PawnMoves(coordinates, getPawn(coordinates));
@@ -430,7 +448,7 @@ public class Board {
         Design.addLightRedMove(coordinates);
     }
     private void lightGreenMove(Coordinates coordinates){
-        System.out.println("Bastı");
+        
         Design.addLightGreenMove(coordinates);
     }
 
