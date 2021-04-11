@@ -6,6 +6,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import pl.nogacz.checkers.application.Design;
 import pl.nogacz.checkers.board.Board;
+import pl.nogacz.checkers.application.Menu;
 
 /**
  * @author Dawid Nogacz on 17.05.2019
@@ -28,5 +29,6 @@ public class Checkers extends Application {
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
+        Menu menu = new Menu(board);
     }
 }
