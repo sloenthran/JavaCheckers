@@ -4,3 +4,7 @@
 .gradle
 /gameCache
 JavaCheckers.jar
+.classpath
+.project
+.settings/
+bin/

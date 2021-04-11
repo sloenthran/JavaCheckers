@@ -1,5 +1,11 @@
 plugins {
-    id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.9'
+
+    // https://imperceptiblethoughts.com/shadow/getting-started/#default-java-groovy-tasks
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+
+    id 'jacoco'
 }
 
 group 'pl.nogacz'
@@ -12,7 +18,25 @@ repositories {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+	testImplementation group: 'junit', name: 'junit', version: '4.12'
+	implementation 'javax.xml.bind:jaxb-api:2.3.1'
+
+	implementation 'commons-cli:commons-cli:1.4'
+
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.6.6'  
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.3'
+
+	implementation 'commons-io:commons-io:2.6'
+
+	implementation 'org.apache.commons:commons-lang3:3.11'
+
+	implementation 'com.h2database:h2:1.4.200'
+
+	implementation 'org.slf4j:slf4j-log4j12:1.7.30'
+
+	implementation 'org.apache.commons:commons-collections4:4.4'
+
+	testImplementation 'org.mockito:mockito-core:2.22.0'
 }
 
 jar {
@@ -21,4 +45,23 @@ jar {
                 'Main-Class': 'pl.nogacz.checkers.Checkers',
         )
     }
+}
+
+mainClassName = 'pl.nogacz.checkers.Checkers'
+
+javafx {
+    version = "15.0.1"
+    modules = [ 'javafx.controls' ]
+}
+
+test {
+	testLogging {
+		showStandardStreams = true
+	}
+
+	finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+	dependsOn test
 }
